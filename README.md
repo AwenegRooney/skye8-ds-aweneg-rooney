@@ -1,3 +1,3 @@
 # skye8-ds-aweneg-rooney
 
-A simple project given to me to test my skills in ML.
+A simple project given to me to test my skills so far in ML.
