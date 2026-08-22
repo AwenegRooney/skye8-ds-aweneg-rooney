@@ -9,6 +9,8 @@ A Python package for analyzing interurban transport booking data, verifying sche
 This package structures data processing routines for interurban transit datasets, enabling seamless data ingestion, model validation, and SQL-driven analytical pipelines.
 
 ## Project Layout
+
+```text
 .
 ├── .github/
 │   └── workflows/
@@ -27,6 +29,7 @@ This package structures data processing routines for interurban transit datasets
 ├── .pre-commit-config.yaml
 ├── pyproject.toml
 └── README.md
+```
 
 ## Installation
 
