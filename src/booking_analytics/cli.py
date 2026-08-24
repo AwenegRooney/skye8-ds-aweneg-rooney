@@ -1,8 +1,9 @@
 import sys
-import pandas as pd
 from pathlib import Path
 
-from .data_cleaner import parse_timestamp, clean_currency
+import pandas as pd
+
+from .data_cleaner import clean_currency, parse_timestamp
 from .db import get_engine
 from .loader import load_data
 
