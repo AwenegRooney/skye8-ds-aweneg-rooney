@@ -1,0 +1,17 @@
+from sqlalchemy import create_engine
+from sqlalchemy.engine import Engine
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+
+def get_engine(db_url: str | None = None) -> Engine:
+    """
+    Creates a SQLAlchemy engine using environment variables.
+    """
+    url = db_url or os.environ.get("DATABASE_URL")
+    if not url:
+        raise ValueError("DATABASE _URL environment variable is not set")
+
+    return create_engine(db_url)
