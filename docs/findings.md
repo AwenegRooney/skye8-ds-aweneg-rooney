@@ -18,12 +18,12 @@ This report summarizes key analytics, database performance benchmarks, and valid
 ### Summary of Parity & Divergence
 During cross-validation between `sql/analytics.sql` and `src/booking_analytics/validate_retention.py`, an initial discrepancy was observed in the relative retention matrices.
 
-+----------------+-----------------+-------------------+-------------------+
-| Metric Source  | Month 0 Cohort  | Month 1 Retention | Month 2 Retention |
-+----------------+-----------------+-------------------+-------------------+
-| Initial Pandas | 327             | 224               | 161               |
-| Target SQL     | 327             | 70                | 52                |
-+----------------+-----------------+-------------------+-------------------+
+
+| Metric Source | Month 0 Cohort | Month 1 Retention | Month 2 Retention |
+| :--- | :---: | :---: | :---: |
+| Initial Pandas | 327 | 224 | 161 |
+| Target SQL | 327 | 70 | 52 |
+
 
 ### Root Cause Analysis
 1. **Row Duplication vs. Entity Resolution**: 
@@ -42,14 +42,14 @@ SELECT * FROM bookings
 WHERE booked_ts >= '2025-01-01' AND booked_ts < '2025-06-01';
 ```
 
-+------------------------+-----------------------+--------------------+--------------------------+
-|**Execution Metric**    |**Unindexed**          |**Indexed**         |**Difference / Impact**   |
-+------------------------+-----------------------+--------------------+--------------------------+
-|  Execution Plan        |  Seq Scan on bookings |  Bitmap Index Scan |  Avoided full table scan |
-|  Total Rows Evaluated  |  101,362 rows         |  16491 rows        |  Filtered 84,871 rows    |
-|  Bitmap Index Search   |  N/A                  |  4.529 ms          |  Rapid in-memory lookup  |
-|  Total Execution Time  |  35.772 ms            |  16.191 ms         |  54.7% Reduction         |
-+------------------------+-----------------------+--------------------+--------------------------+
+
+| Execution Metric | Unindexed | Indexed | Difference / Impact |
+| :--- | :--- | :--- | :--- |
+| Execution Plan | Seq Scan on bookings | Bitmap Index Scan | Avoided full table scan |
+| Total Rows Evaluated | 101,362 rows | 16491 rows | Filtered 84,871 rows |
+| Bitmap Index Search | N/A | 4.529 ms | Rapid in-memory lookup |
+| Total Execution Time | 35.772 ms | 16.191 ms | 54.7% Reduction |
+
 
 ### Scan Strategy Shift Explanation
 - **Sequential Scan (Seq Scan):** Without an index, PostgreSQL reads every physical table block from disk into memory sequentially to evaluate the booked_ts predicate, discarding non-matching records after reading.
