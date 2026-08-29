@@ -7,7 +7,7 @@ A Python package for analyzing interurban transport booking data, verifying sche
 ## Overview
 
 This package structures data processing routines for interurban transit datasets, enabling seamless data ingestion, model validation, and SQL-driven analytical pipelines.
-Database: Local PostgreSQL.
+- Database: Local PostgreSQL.
 
 ## Project Layout
 
