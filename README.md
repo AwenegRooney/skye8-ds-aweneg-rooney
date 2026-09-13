@@ -17,15 +17,27 @@ This package structures data processing routines for interurban transit datasets
 │   └── workflows/
 │       └── ci.yml
 ├── docs/
-│   └── conflict-note.md
+    ├── conflict-note.md
+    ├── findings.md
+│   └── load_decisions.md
 ├── sql/
+    ├── analytics.sql
+    ├── exercise.sql
+    └── schema.sql
 ├── src/
 │   └── booking_analytics/
-│       ├── init.py
-│       └── cli.py
+│       ├── __init__.py
+        ├── cli.py
+        ├── data_cleaner.py
+        ├── db.py
+        ├── loader.py
+│       └── validated_retention.py
 ├── tests/
-│   ├── init.py
-│   └── test_basic.py
+│   ├── __init__.py
+    ├── conftest.py
+    ├── test_basic.py
+    ├── test_parsing.py
+│   └── test_pipeline.py
 ├── .gitignore
 ├── .pre-commit-config.yaml
 ├── pyproject.toml
