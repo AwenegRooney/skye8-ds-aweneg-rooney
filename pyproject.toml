@@ -59,6 +59,9 @@ mypy_path = ["src"]
 
 [[tool.mypy.overrides]]
 module = [
-    "sklearn.*"
+    "sklearn.*",
+    "scipy.*",
+    "statsmodels.*",
+    "mlflow.*"
 ]
 ignore_missing_imports = true
