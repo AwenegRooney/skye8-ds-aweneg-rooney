@@ -2,8 +2,8 @@ import numpy as np
 import pandas as pd
 
 
-def get_error(df: pd.DataFrame) -> pd.DataFrame:
-    df["error"] = df["actual_minutes"] - df["predicted_minutes_v1"]
+def get_error(df: pd.DataFrame, actual_col: str, predicted_col: str) -> pd.DataFrame:
+    df["error"] = df[actual_col] - df[predicted_col]
     return df
 
 
@@ -17,8 +17,12 @@ def get_squared_error(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def get_metrics(df: pd.DataFrame) -> pd.Series:
-    df = get_error(df)
+def get_metrics(
+    df: pd.DataFrame,
+    actual_col: str = "actual_minutes",
+    predicted_col: str = "predicted_minutes_v1",
+) -> pd.Series:
+    df = get_error(df, actual_col, predicted_col)
     df = get_absolute_error(df)
     df = get_squared_error(df)
 
@@ -33,6 +37,6 @@ def get_metrics(df: pd.DataFrame) -> pd.Series:
             "Mean Absolute Error": mae,
             "Root Mean Square Error": rmse,
             "Median Absolute Error": median,
-            "Percentage of Errors > 10": error_percentage,
+            "Percentage of Errors above 10 minutes": error_percentage,
         }
     )

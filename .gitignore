@@ -2,6 +2,10 @@
 data/
 *.csv
 
+# Mlflow data
+mlruns/
+mlflow.db
+*.pkl
 
 # Python cache
 __pycache__/

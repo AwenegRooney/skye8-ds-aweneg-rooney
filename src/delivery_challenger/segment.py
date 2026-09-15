@@ -13,13 +13,13 @@ def add_hour_of_day(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def get_group_metrics(df: pd.DataFrame, column: str) -> pd.DataFrame:
+def get_group_metrics(df: pd.DataFrame, column: str) -> pd.DataFrame | pd.Series:
     df_grouped = df.groupby(column).apply(get_metrics)
 
     return df_grouped
 
 
-def get_all_group_data(df: pd.DataFrame) -> dict[str, pd.DataFrame]:
+def get_all_group_data(df: pd.DataFrame) -> dict[str, pd.DataFrame | pd.Series]:
     df = add_distance_bucket(df)
     df = add_hour_of_day(df)
     column_names = [
