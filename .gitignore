@@ -1,7 +1,7 @@
 # Folders
 data/
 *.csv
-
+mlruns/
 
 # Python cache
 __pycache__/
