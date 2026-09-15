@@ -1,3 +1,5 @@
+from typing import cast
+
 import mlflow
 from mlflow.pyfunc import PyFuncModel
 
@@ -13,7 +15,7 @@ from delivery_challenger.statistics import (
 def load_staging_model() -> PyFuncModel:
     """Loads the model currently in Staging from the MLflow Model Registry."""
     model_uri = "models:/delivery-challengers/Staging"
-    return mlflow.pyfunc.load_model(model_uri)
+    return cast(PyFuncModel, mlflow.pyfunc.load_model(model_uri))
 
 
 def main() -> None:
