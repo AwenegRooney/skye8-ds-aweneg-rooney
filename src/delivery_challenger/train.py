@@ -133,7 +133,7 @@ def main() -> None:
 
     feature_columns = numeric_features + categorical_features
 
-    l_params = {"objective": "regression", "metric": "rmse"}
+    l_params: dict[str, Any] = {"objective": "regression", "metric": "rmse"}
 
     linear_model = LinearRegression()
     random_forest_model = RandomForestRegressor()
