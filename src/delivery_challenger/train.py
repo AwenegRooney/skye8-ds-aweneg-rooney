@@ -83,7 +83,9 @@ def run_experiment(
             pipeline, train_df, test_df, feature_columns
         )
 
-        mlflow.log_metrics(metrics.to_dict())
+        clean_metrics = {str(v): float(k) for v, k in metrics.to_dict().items()}
+
+        mlflow.log_metrics(clean_metrics)
 
         mlflow.sklearn.log_model(
             fitted_pipeline,
