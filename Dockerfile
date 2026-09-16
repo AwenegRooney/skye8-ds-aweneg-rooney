@@ -10,15 +10,14 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 # Install dependencies
 COPY pyproject.toml README.md /app/
+COPY src/ /app/src/
 RUN pip install --no-cache-dir .
 
 # Copy application source code and data
-COPY src/ /app/src/
 COPY models/ /app/models/
 
 EXPOSE 8000
 
 ENV PYTHONPATH=/app/src
-ENV MODEL_URI=models:/delivery-challengers/Staging
 
 CMD ["uvicorn", "delivery_challenger.api.app:app", "--host", "0.0.0.0", "--port", "8000"]
