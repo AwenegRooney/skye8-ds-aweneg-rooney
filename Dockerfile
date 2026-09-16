@@ -14,7 +14,7 @@ RUN pip install --no-cache-dir .
 
 # Copy application source code and data
 COPY src/ /app/src/
-COPY mlruns/ /app/mlruns/
+COPY models/ /app/models/
 
 EXPOSE 8000
 
