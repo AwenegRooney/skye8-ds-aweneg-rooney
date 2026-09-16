@@ -108,3 +108,45 @@ def typed_metrics_df() -> pd.DataFrame:
     df["pickup_zone"] = df["pickup_zone"].astype("string")
 
     return df
+
+
+@pytest.fixture
+def sample_challenger_payload():
+    return {
+        "distance_km": 18.5,
+        "experience_months": 12,
+        "hour_of_day": 11,
+        "raining": 0,
+        "congestion_index": 0.5,
+        "tarred_share_pct": 80,
+        "congestion_index_dropoff": 0.4,
+        "tarred_share_pct_dropoff": 70,
+        "package_type": "food",
+        "pickup_zone": "Akwa",
+        "vehicle": "motorbike",
+        "dropoff_zone": "Bonanjo",
+        "home_zone": "Bassa",
+        "market_zone_dropoff": 0,
+        "market_zone": 0,
+    }
+
+
+@pytest.fixture
+def sample_incumbent_payload():
+    return {
+        "distance_km": 5.0,
+        "experience_months": 12,
+        "hour_of_day": 11,
+        "raining": 0,
+        "congestion_index": 0.5,
+        "tarred_share_pct": 80,
+        "congestion_index_dropoff": 0.4,
+        "tarred_share_pct_dropoff": 70,
+        "package_type": "food",
+        "pickup_zone": "Akwa",
+        "vehicle": "motorbike",
+        "dropoff_zone": "Bonanjo",
+        "home_zone": "Bassa",
+        "market_zone_dropoff": 0,
+        "market_zone": 0,
+    }
