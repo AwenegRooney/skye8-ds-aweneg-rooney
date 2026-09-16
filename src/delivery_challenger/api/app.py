@@ -15,6 +15,7 @@ from delivery_challenger.api.routing import (
     calculate_incumbent_prediction,
     should_route_to_challenger,
 )
+from delivery_challenger.monitoring import check_input_drift, check_rollback_criteria
 
 # Configure logger
 logger = logging.getLogger("delivery_challenger.routing")
@@ -27,12 +28,22 @@ if not logger.handlers:
 challenger_model: Any | None = None
 is_circuit_breaker_open: bool = False
 
+# In-memory log buffer for monitoring (in production: use database or external logging)
+prediction_logs: list[dict[str, Any]] = []
+MAX_LOG_BUFFER = 10000
+
+# Baseline statistics for drift detection (from Stage A findings)
+BASELINE_STATS = {
+    "distance_km_mean": 12.5,
+    "hour_of_day_mean": 12.0,
+}
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     global challenger_model
     try:
-        model_uri = os.getenv("MODEL_URI", "./models")
+        model_uri = os.getenv("MODEL_URI", "models:/delivery-challengers/Staging")
         challenger_model = mlflow.pyfunc.load_model(model_uri)
     except Exception:  # noqa: BLE001
         challenger_model = None
@@ -77,6 +88,13 @@ class PredictionResponse(BaseModel):
     routed_to_challenger: bool
 
 
+class GroundTruthRequest(BaseModel):
+    delivery_id: str
+    actual_minutes: float
+    predicted_minutes: float
+    model_version: str
+
+
 def log_routing_decision(
     payload: dict[str, Any],
     routed_to_challenger: bool,
@@ -85,7 +103,7 @@ def log_routing_decision(
     reason: str,
     latency_ms: float,
 ) -> None:
-    """Logs structured JSON audit record using json.dumps()."""
+    """Logs structured JSON audit record for routing decision."""
     log_entry = {
         "timestamp": time.time(),
         "distance_km": payload.get("distance_km"),
@@ -100,7 +118,42 @@ def log_routing_decision(
     logger.info(f"ROUTING_DECISION: {json.dumps(log_entry)}")
 
 
-@app.get("/health", status_code=status.HTTP_200_OK)
+def log_ground_truth(
+    delivery_id: str,
+    actual_minutes: float,
+    predicted_minutes: float,
+    model_version: str,
+) -> None:
+    """Logs ground truth outcome and computes error."""
+    absolute_error = abs(actual_minutes - predicted_minutes)
+    log_entry = {
+        "timestamp": time.time(),
+        "delivery_id": delivery_id,
+        "actual_minutes": actual_minutes,
+        "predicted_minutes": predicted_minutes,
+        "model_version": model_version,
+        "absolute_error": absolute_error,
+    }
+    logger.info(f"GROUND_TRUTH: {json.dumps(log_entry)}")
+
+    # Store in buffer for monitoring checks
+    global prediction_logs
+    prediction_logs.append(log_entry)
+    if len(prediction_logs) > MAX_LOG_BUFFER:
+        prediction_logs = prediction_logs[-MAX_LOG_BUFFER:]
+
+    # Check rollback criteria every ground truth record
+    should_rollback, reason = check_rollback_criteria(prediction_logs)
+    if should_rollback:
+        logger.error(f"MONITORING_ALERT: {reason}")
+
+    # Check drift detection
+    drift_detected, drift_reason = check_input_drift(prediction_logs, BASELINE_STATS)
+    if drift_detected:
+        logger.warning(f"DRIFT_ALERT: {drift_reason}")
+
+
+@app.get("/health", status_code=status.HTTP_200_OK)  # type: ignore[untyped-decorator]
 def health_check(response: Response) -> dict[str, Any]:
     global is_circuit_breaker_open  # noqa: PLW0602
     if is_circuit_breaker_open:
@@ -116,7 +169,7 @@ def health_check(response: Response) -> dict[str, Any]:
     }
 
 
-@app.post("/rollback", status_code=status.HTTP_200_OK)
+@app.post("/rollback", status_code=status.HTTP_200_OK)  # type: ignore[untyped-decorator]
 def trigger_rollback() -> dict[str, str]:
     global is_circuit_breaker_open
     is_circuit_breaker_open = True
@@ -128,7 +181,7 @@ def trigger_rollback() -> dict[str, str]:
     }
 
 
-@app.post("/predict", response_model=PredictionResponse)
+@app.post("/predict", response_model=PredictionResponse)  # type: ignore[untyped-decorator]
 def predict(request: PredictionRequest) -> PredictionResponse:
     start_time = time.perf_counter()
     payload = request.model_dump()
@@ -214,3 +267,17 @@ def predict(request: PredictionRequest) -> PredictionResponse:
             model_version="incumbent_v1.4.2",
             routed_to_challenger=False,
         )
+
+
+@app.post("/record_actual", status_code=status.HTTP_200_OK)  # type: ignore[untyped-decorator]
+def record_actual(request: GroundTruthRequest) -> dict[str, str]:
+    """
+    Record ground truth after delivery completes.
+    """
+    log_ground_truth(
+        request.delivery_id,
+        request.actual_minutes,
+        request.predicted_minutes,
+        request.model_version,
+    )
+    return {"status": "recorded"}
