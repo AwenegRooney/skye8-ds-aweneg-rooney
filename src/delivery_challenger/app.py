@@ -32,7 +32,7 @@ is_circuit_breaker_open: bool = False
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     global challenger_model
     try:
-        model_uri = os.getenv("MODEL_URI", "models:/delivery-challengers/Staging")
+        model_uri = os.getenv("MODEL_URI", "./models")
         challenger_model = mlflow.pyfunc.load_model(model_uri)
     except Exception:  # noqa: BLE001
         challenger_model = None
