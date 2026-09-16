@@ -3,7 +3,7 @@ from unittest.mock import MagicMock, patch
 
 from fastapi.testclient import TestClient
 
-from delivery_challenger.app import app
+from delivery_challenger.api.app import app
 
 
 def test_health_check_healthy():
