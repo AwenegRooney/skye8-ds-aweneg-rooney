@@ -11,7 +11,7 @@ import pandas as pd
 from fastapi import FastAPI, Response, status
 from pydantic import BaseModel, Field
 
-from delivery_challenger.routing import (
+from delivery_challenger.api.routing import (
     calculate_incumbent_prediction,
     should_route_to_challenger,
 )
@@ -32,7 +32,7 @@ is_circuit_breaker_open: bool = False
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     global challenger_model
     try:
-        model_uri = os.getenv("MODEL_URI", "models:/delivery-challengers/Staging")
+        model_uri = os.getenv("MODEL_URI", "./models")
         challenger_model = mlflow.pyfunc.load_model(model_uri)
     except Exception:  # noqa: BLE001
         challenger_model = None
@@ -100,7 +100,7 @@ def log_routing_decision(
     logger.info(f"ROUTING_DECISION: {json.dumps(log_entry)}")
 
 
-@app.get("/health", status_code=status.HTTP_200_OK)  # type: ignore[untyped-decorator]
+@app.get("/health", status_code=status.HTTP_200_OK)
 def health_check(response: Response) -> dict[str, Any]:
     global is_circuit_breaker_open  # noqa: PLW0602
     if is_circuit_breaker_open:
@@ -116,7 +116,7 @@ def health_check(response: Response) -> dict[str, Any]:
     }
 
 
-@app.post("/rollback", status_code=status.HTTP_200_OK)  # type: ignore[untyped-decorator]
+@app.post("/rollback", status_code=status.HTTP_200_OK)
 def trigger_rollback() -> dict[str, str]:
     global is_circuit_breaker_open
     is_circuit_breaker_open = True
@@ -128,7 +128,7 @@ def trigger_rollback() -> dict[str, str]:
     }
 
 
-@app.post("/predict", response_model=PredictionResponse)  # type: ignore[untyped-decorator]
+@app.post("/predict", response_model=PredictionResponse)
 def predict(request: PredictionRequest) -> PredictionResponse:
     start_time = time.perf_counter()
     payload = request.model_dump()

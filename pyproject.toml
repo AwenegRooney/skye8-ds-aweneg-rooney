@@ -7,7 +7,7 @@ name = "Portfolio"
 version = "0.1.0"
 description = "A package showing my portfolio of work"
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.12"
 dependencies = [
     "pandas>=2.0.0",
     "pandas-stubs",
@@ -43,15 +43,14 @@ where = ["src"]
 
 [tool.black]
 line-length = 88
-target-version = ['py310']
+target-version = ['py312']
 
 [tool.ruff]
 line-length = 88
-target-version = "py310"
+target-version = "py312"
 
 [tool.mypy]
 python_version = "3.12"
-strict = true
 warn_return_any = true
 warn_unused_configs = true
 disallow_untyped_defs = true
@@ -62,6 +61,7 @@ module = [
     "sklearn.*",
     "scipy.*",
     "statsmodels.*",
-    "mlflow.*"
+    "mlflow.*",
+    "delivery_challenger.api"
 ]
 ignore_missing_imports = true

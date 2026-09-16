@@ -1,0 +1,26 @@
+artifact_path: /home/rooney-flow/Desktop/skye8_internship/skye8-ds-aweneg-rooney/mlruns/1/models/m-db1dc27ab39346a6b86f0ff155d462b4/artifacts
+flavors:
+  python_function:
+    env:
+      conda: conda.yaml
+      virtualenv: python_env.yaml
+    loader_module: mlflow.sklearn
+    model_path: model.skops
+    predict_fn: predict
+    python_version: 3.12.3
+  sklearn:
+    code: null
+    pickled_model: model.skops
+    serialization_format: skops
+    sklearn_version: 1.9.1
+    skops_trusted_types:
+    - collections.OrderedDict
+    - lightgbm.basic.Booster
+    - lightgbm.sklearn.LGBMRegressor
+mlflow_version: 3.16.0
+model_id: m-db1dc27ab39346a6b86f0ff155d462b4
+model_size_bytes: 472833
+model_uuid: m-db1dc27ab39346a6b86f0ff155d462b4
+prompts: null
+run_id: c4d99ef40430487aa4776435414b21ba
+utc_time_created: '2026-09-14 17:50:32.784135'
